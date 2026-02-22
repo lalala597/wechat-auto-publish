@@ -1,1 +1,43 @@
+name: Publish to WeChat
 
+on:
+  workflow_dispatch:
+    inputs:
+      article_file:
+        description: '文章文件名 (如: article.md)'
+        required: true
+        default: 'article.md'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        npm install -g wenyan-cli
+        
+    - name: Get GitHub Actions IP
+      id: ip
+      run: |
+        echo "ip=$(curl -s https://api.ipify.org)" >> $GITHUB_OUTPUT
+        
+    - name: Show IP
+      run: |
+        echo "Current IP: ${{ steps.ip.outputs.ip }}"
+        echo "请将此 IP 添加到微信公众平台的 IP 白名单"
+        
+    - name: Publish article
+      env:
+        WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
+        WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
+      run: |
+        echo "Publishing ${{ github.event.inputs.article_file }}"
