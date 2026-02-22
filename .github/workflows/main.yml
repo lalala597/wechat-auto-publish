@@ -1,0 +1,28 @@
+name: Publish to WeChat
+
+on:
+  workflow_dispatch:
+    inputs:
+      article_file:
+        description: '文章文件名'
+        required: true
+        default: 'article.md'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Get IP
+      run: |
+        echo "Current IP: $(curl -s https://api.ipify.org)"
+        
+    - name: Publish
+      env:
+        WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
+        WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
+      run: |
+        echo "Publishing..."
